@@ -2,14 +2,21 @@ const express = require('express');
 const router = express.Router();
 const userControl = require("../controller/userController");
 
+
+
 /**
- * @todo Methods for User login and register
+ * @swagger
+ * @description LOGIN ROUTE FOR USER LOGIN
  */
-
 router.route('/')
-  .post(userControl.userLoginPost)
+  .post(userControl.userLogin)
 
+
+/**
+ * @description REGISTER ROUTE FOR USER REGISTRATION
+ */
 router.route('/r')
-  .post(userControl.userRegisterPost)
+  .post(userControl.userRegister)
+
 
 module.exports = router;

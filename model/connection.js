@@ -14,6 +14,10 @@ mongoose.connect(process.env.DB_URI, {
         console.log(`Error while connecting the database ${err}`.red)
     })
 
+
+/**
+ * @description ALL MODEL EXPORTS 
+ */
 module.exports.role = require("./roleModel")
 module.exports.user = require("./userModel")
 module.exports.post = require("./postModel")

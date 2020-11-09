@@ -2,6 +2,11 @@ const mongoose = require("mongoose")
 const slugify = require("slugify")
 const ObjectId = mongoose.Schema.Types.ObjectId
 
+
+
+/**
+* @description POST MODEL SCHEMA FOR COMMENT ENTRY WITH VALIDATION
+*/
 const postSchema = new mongoose.Schema({
     title: {
         type: String,
@@ -54,8 +59,9 @@ const postSchema = new mongoose.Schema({
 )
 
 
+
 /**
- * @description FOR SLUG THE TITLE FIELD FOR BETTER READABLE RESPONSE
+ * @description PRE HOOK FOR SLUG THE TITLE FIELD FOR BETTER READABLE RESPONSE / ALSO FOR SEO PURPOSE
  */
 postSchema.pre('save', function (next) {
     this.slug = slugify(this.title, { lower: true })
@@ -66,11 +72,13 @@ postSchema.pre('save', function (next) {
 
 /**
  * @description FOR SLUG THE TITLE FIELD FOR BETTER READABLE RESPONSE / UPDATE
+ * @todo HOW TO UPDATE SLUG ALSO ON METHOD findOneAndUpdate => reason. This methods not working on pre post hooks
  */
-// postSchema.pre('findOneAndUpdate', function (next) {
-//     this.slug = slugify(this.title, { lower: true })
-//     next()
-// })
+postSchema.pre('findOneAndUpdate', true, function (next) {
+    console.log("called")
+    this.slug = slugify(this.title, { lower: true })
+    next()
+})
 
 
 
@@ -78,11 +86,11 @@ postSchema.pre('save', function (next) {
  * @description PRE HOOK FOR CASCADE DELETE OF COMMENTS WITH POST
  * @todo WHY REMOVE ONLY WORKS
  */
-postSchema.pre('findByIdAndUpdate', async function (next) {
-    console.log(`Comments being removed from post ${this._id}`.red)
-    await this.model('comment').updateMany({ isDeleted: true, post: this._id })
-    next()
-})
+// postSchema.pre('findByIdAndUpdate', async function (next) {
+//     console.log(`Comments being removed from post ${this._id}`.red)
+//     await this.model('comment').updateMany({ isDeleted: true, post: this._id })
+//     next()
+// })
 
 
 /**
@@ -94,5 +102,7 @@ postSchema.pre('findByIdAndUpdate', async function (next) {
 //     foreignField: 'post',
 //     justOne: false
 // })
+
+
 
 module.exports = mongoose.model("post", postSchema)

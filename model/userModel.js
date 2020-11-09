@@ -3,6 +3,11 @@ const ObjectId = mongoose.Schema.Types.ObjectId;
 const bcrypt = require('bcryptjs');
 const jwt = require("jsonwebtoken")
 
+
+
+/**
+ * @description USER MODEL SCHEMA FOR USERS WITH VALIDATION
+ */
 const userSchema = new mongoose.Schema({
     firstName: {
         type: String,
@@ -51,8 +56,10 @@ const userSchema = new mongoose.Schema({
     })
 
 
+
+
 /**
- * @description BCRYPT FOR HASHING PASSWORD
+ * @description PRE HOOK FOR BCRYPT FOR HASHING PASSWORD
  */
 userSchema.pre('save', async function (next) {
     const salt = await bcrypt.genSalt(10)
@@ -63,7 +70,7 @@ userSchema.pre('save', async function (next) {
 
 
 /**
- * @description SIGN JWT AND RETURN 
+ * @description METHOD FOR MODEL, SIGN JWT AND RETURN 
  */
 userSchema.methods.getSignedJwtToken = function () {
     return jwt.sign({ id: this._id, role: "Users" }, process.env.JWT_SECRET, {
@@ -73,14 +80,11 @@ userSchema.methods.getSignedJwtToken = function () {
 
 
 /**
- * @description COMPARE PASSWORDS
+ * @description METHOD FOR MODEL, COMPARE PASSWORDS
  */
 userSchema.methods.matchPassword = async function (enteredPassword) {
     return await bcrypt.compare(enteredPassword, this.password)
 }
-
-
-
 
 
 module.exports = mongoose.model("user", userSchema)

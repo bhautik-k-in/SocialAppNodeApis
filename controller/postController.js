@@ -20,7 +20,6 @@ exports.posts = asyncHandler(async (req, res, next) => {
 
 
 
-
 /**
  * @description GET SINGLE POSTS [ WITH USER LOGIN / WTHOUT USER LOGIN BOTH]
  * @Route       GET /api/v1/posts/
@@ -51,7 +50,6 @@ exports.getPost = asyncHandler(async (req, res, next) => {
 
 
 
-
 /**
  * @description ADD NEW POST
  * @Route       POST /api/v1/posts
@@ -65,8 +63,6 @@ exports.addPost = asyncHandler(async (req, res, next) => {
     const post = await POST.create(req.body)
     res.status(201).json({ success: true, message: `Post added successfully`, data: post })
 })
-
-
 
 
 
@@ -115,7 +111,6 @@ exports.editPost = asyncHandler(async (req, res, next) => {
 
 
 
-
 /**
  * @description DELETE POST
  * @Route       DELETE /api/v1/posts/:id
@@ -138,6 +133,8 @@ exports.deletePost = asyncHandler(async (req, res, next) => {
         deletedAt: Date.now(),
         new: true
     })
+
+    COMMENT.updateMany()
 
     let _deleteComments = await COMMENT.find({ post: req.params.id })
 

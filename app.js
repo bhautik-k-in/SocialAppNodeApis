@@ -7,6 +7,8 @@ const colors = require("colors")
 const mongoSanitize = require("express-mongo-sanitize")
 const helmet = require("helmet")
 const xssClean = require("xss-clean")
+const swaggerJsdoc = require("swagger-jsdoc")
+const swaggerUi = require("swagger-ui-express")
 const errorHandler = require("./middleware/errorHandler")
 require("./model/connection")
 
@@ -17,9 +19,6 @@ const commentRouter = require("./routes/comments")
 
 const app = express();
 
-// view engine setup
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'ejs');
 
 // SANITIZE DATA
 app.use(mongoSanitize())
@@ -31,10 +30,31 @@ app.use(helmet())
 app.use(xssClean())
 
 
+// SWAGGER
+const swaggerOptions = {
+  swaggerDefinition: {
+    info: {
+      title: 'Social api',
+      description: 'Social api information',
+      contact: {
+        name: "Bhautik Kevadiya"
+      },
+      servers: ["http://localhost:3000"]
+    }
+  },
+  apis: ['.routes/*.js']
+}
+
+// SWAGGER DOCS 
+const swaggerDocs = swaggerJsdoc(swaggerOptions)
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs))
+
+
 app.use(logger('dev'));
 app.use(express.urlencoded({ extended: false }), express.json());
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+
 
 app.use('/api/v1', indexRouter);
 app.use('/api/v1/users', usersRouter);

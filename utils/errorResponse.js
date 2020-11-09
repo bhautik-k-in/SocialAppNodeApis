@@ -9,6 +9,3 @@ class errorResponse extends Error {
 }
 
 module.exports = errorResponse
-/**
- * @todo LEARN ABOUT THIS ERROR RESPONSE UTILS
- */

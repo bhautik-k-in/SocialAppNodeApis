@@ -2,6 +2,12 @@ const mongoose = require('mongoose');
 const ObjectId = mongoose.Schema.Types.ObjectId
 const POST = require("../model/connection").post
 
+
+
+/**
+ * @description COMMENT MODEL SCHEMA FOR COMMENT ENTRY WITH VALIDATION
+ */
+
 const commentSchema = new mongoose.Schema({
     message: {
         type: String,
@@ -40,8 +46,9 @@ const commentSchema = new mongoose.Schema({
 
 
 /**
- * @description COMMENTS ADDED TO RESPECTIVE POST 
+ * @description POST HOOK FOR COMMENTS TO ADD INTO RESPECTIVE POST 
  */
+
 commentSchema.post('create', async function (next) {
     console.log(`comments being added to post ${this.post}`)
     const point = await POST.findById(req.params.postid)
@@ -50,7 +57,9 @@ commentSchema.post('create', async function (next) {
 })
 
 
-
+/**
+ * @description COMMENT UPDATE BUT HOW TO RUN FindOneAndUpdate METHOD IN PRE / POST HOOKS?? 
+ */
 // commentSchema.post('findOneAndUpdate', async function (next) {
 //     let point = await POST.findById(req.params.postid)
 //     point = point.comments.pop(comment._id)

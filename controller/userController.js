@@ -14,7 +14,7 @@ require("dotenv/config")
  * @param {*} res 
  * @param {*} next 
  */
-exports.userLoginPost = asyncHandler(async (req, res, next) => {
+exports.userLogin = asyncHandler(async (req, res, next) => {
     const { email, password } = req.body
 
     if (!email || !password) {
@@ -35,7 +35,7 @@ exports.userLoginPost = asyncHandler(async (req, res, next) => {
 
 
     /**
-      * @description TOKEN GENERATED
+      * @description COMMON METHOD FOR TOKEN GENERATED
       */
     sendToTokenResponse(user, 200, res)
 })
@@ -50,13 +50,13 @@ exports.userLoginPost = asyncHandler(async (req, res, next) => {
  * @param {*} res 
  * @param {*} next 
  */
-exports.userRegisterPost = asyncHandler(async (req, res, next) => {
-    const userData = await ROLE.findOne({ name: "Users" })
-    req.body.role = userData._id
+exports.userRegister = asyncHandler(async (req, res, next) => {
+    const _userData = await ROLE.findOne({ name: "Users" })
+    req.body.role = _userData._id
     const user = await USERS.create(req.body)
 
     /**
-     * @description TOKEN GENERATED
+     * @description COMMON METHOD FOR TOKEN GENERATED
      */
     sendToTokenResponse(user, 200, res)
 })
@@ -68,7 +68,6 @@ exports.userRegisterPost = asyncHandler(async (req, res, next) => {
  * @description GENERATE TOKEN AND SET IT INTO COOKIE COMMONG METHOD
  */
 const sendToTokenResponse = (user, statusCode, res) => {
-
     const token = user.getSignedJwtToken()
 
 
@@ -83,6 +82,9 @@ const sendToTokenResponse = (user, statusCode, res) => {
     }
 
 
+    /**
+     * @description RESPONSE BACK WITH DATA
+     */
     res.setHeader("auth-token", token)
     res
         .status(statusCode)

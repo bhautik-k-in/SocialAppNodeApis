@@ -1,3 +1,6 @@
+/**
+ * @description ErrorResponse with message and statusCode
+ */
 class errorResponse extends Error {
     constructor(message, statusCode) {
         super(message)

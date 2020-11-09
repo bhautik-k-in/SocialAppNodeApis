@@ -4,6 +4,9 @@ const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const colors = require("colors")
+const mongoSanitize = require("express-mongo-sanitize")
+const helmet = require("helmet")
+const xssClean = require("xss-clean")
 const errorHandler = require("./middleware/errorHandler")
 require("./model/connection")
 
@@ -17,6 +20,16 @@ const app = express();
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
+
+// SANITIZE DATA
+app.use(mongoSanitize())
+
+// SET SECURITY HEADERS
+app.use(helmet())
+
+// PREVENT CROSS SITE SCRIPTING ATTACK
+app.use(xssClean())
+
 
 app.use(logger('dev'));
 app.use(express.urlencoded({ extended: false }), express.json());
@@ -43,7 +56,7 @@ app.use(function (err, req, res, next) {
 
   // render the error page
   res.status(err.status || 500);
-  console.log(err.status)
+  console.log(err.status.red)
   res.render('error');
 });
 

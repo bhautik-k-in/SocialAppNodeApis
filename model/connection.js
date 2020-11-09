@@ -1,14 +1,17 @@
 const mongoose = require('mongoose')
 require("dotenv/config")
 
+/**
+ * @description Mongodb Connection 
+ */
 mongoose.connect(process.env.DB_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
     useCreateIndex: true
 })
-    .then(() => { console.log("MongoDB Connected".yellow) })
+    .then(() => { console.log("MongoDB Connected....".yellow.inverse) })
     .catch(err => {
-        console.log("Error while connecting database " + err)
+        console.log(`Error while connecting the database ${err}`.red)
     })
 
 module.exports.role = require("./roleModel")

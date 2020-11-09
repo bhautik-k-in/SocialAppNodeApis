@@ -1,5 +1,8 @@
 const USERS = require("../model/connection").user
-const authUser = require("../authentication/userAuth")
+const asyncHandler = require("../middleware/async")
+const errorResponse = require("../utils/errorResponse")
+const ROLE = require("../model/connection").role
+require("dotenv/config")
 
 
 
@@ -11,29 +14,82 @@ const authUser = require("../authentication/userAuth")
  * @param {*} res 
  * @param {*} next 
  */
-exports.userLoginPost = async (req, res, next) => {
-    res.status(200).json({ success: true, msg: "LOGIN PAGE POST METHOD" });
-}
+exports.userLoginPost = asyncHandler(async (req, res, next) => {
+    const { email, password } = req.body
+
+    if (!email || !password) {
+        return next(new errorResponse(`Please provide email and password`, 400))
+    }
+
+    const user = await USERS.findOne({ email })
+
+    if (!user) {
+        return next(new errorResponse(`Invalid Credentials`, 401))
+    }
+
+    const isMatch = await user.matchPassword(password)
+
+    if (!isMatch) {
+        return next(new errorResponse(`Invalid Credentials`, 401))
+    }
+
+
+    /**
+      * @description TOKEN GENERATED
+      */
+    sendToTokenResponse(user, 200, res)
+})
 
 
 
 /**
  * @description USER REGISTER PAGE
- * @Route       POST /api/v1/users/r
+ * @Route       POST /api/v1/users/r OR /api/v1/role
  * @access      PUBLIC
  * @param {*} req 
  * @param {*} res 
  * @param {*} next 
  */
-exports.userRegisterPost = async (req, res, next) => {
-    console.log(req.body)
-    try {
-        const _sanitizedUser = await authUser.validateAsync(req.body, { abortEarly: false })
-        console.log(_sanitizedUser)
-        const userData = await USERS.create(_sanitizedUser)
-        console.log(userData)
-        res.status(201).json({ success: true, data: userData })
-    } catch (error) {
-        res.status(400).json({ success: false, error: error })
+exports.userRegisterPost = asyncHandler(async (req, res, next) => {
+    const userData = await ROLE.findOne({ name: "Users" })
+    req.body.role = userData._id
+    const user = await USERS.create(req.body)
+
+    /**
+     * @description TOKEN GENERATED
+     */
+    sendToTokenResponse(user, 200, res)
+})
+
+
+
+
+/**
+ * @description GENERATE TOKEN AND SET IT INTO COOKIE COMMONG METHOD
+ */
+const sendToTokenResponse = (user, statusCode, res) => {
+
+    const token = user.getSignedJwtToken()
+
+
+    /**
+     * @description FOR PRODUCTION ENVIRONMENT, YOU CAN SET secure:true for HTTPS
+     */
+    const options = {
+        expires: new Date(
+            Date.now() + process.env.JWT_COOKIE_EXPIRE * 24 * 60 * 60 * 1000
+        ),
+        httpOnly: true
     }
+
+
+    res.setHeader("auth-token", token)
+    res
+        .status(statusCode)
+        .cookie('token', token, options)
+        .json({
+            success: true,
+            message: `Successfull`,
+            token
+        })
 }

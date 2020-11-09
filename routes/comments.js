@@ -1,27 +1,15 @@
 const express = require('express');
-const router = express.Router();
+const router = express.Router({ mergeParams: true });
 const commentControl = require("../controller/commentController")
+const { protect, isAuthorized } = require("../middleware/authRoutes")
 
-
-router.get('/:id', commentControl.getComment)
-
-router.post("/", commentControl.addComment)
-
-router.put("/:id", commentControl.editComment)
-
-router.delete('/:id', commentControl.deleteComment)
-
-
-/**
- * @todo IS THIS TYPE OF ROUTE IS PROPER OR NOT
- */
 
 router.route('/')
-    .post(commentControl.addComment)
+    .post(protect, isAuthorized('Admin', 'Users'), commentControl.addComment)
 
 router.route('/:id')
     .get(commentControl.getComment)
-    .get(commentControl.editComment)
-    .delete(commentControl.deleteComment)
+    .put(protect, isAuthorized('Admin', 'Users'), commentControl.editComment)
+    .delete(protect, isAuthorized('Admin', 'Users'), commentControl.deleteComment)
 
 module.exports = router;
